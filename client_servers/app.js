@@ -23,50 +23,50 @@ app.use(express.static('public'))
 app.use(morgan('dev'))
 
 //mongoose and mongo sandbox routes
-// app.get("/app-blog",(req,res) => {
-//      const blog = new Blog({
-//          title: 'new blog',
-//          snippet: 'about my new blog',
-//          body: 'more about my new blog'
-//      })
-//      blog.save()
-//      .then((result) => {
-//          res.send(result)
-//      })
-//      .catch((err) => {
-//          console.log(err)
-//      })
-// })
+app.get("/app-blog",(req,res) => {
+     const blog = new Blog({
+         title: 'new blog',
+         snippet: 'about my new blog',
+         body: 'more about my new blog'
+     })
+     blog.save()
+     .then((result) => {
+         res.send(result)
+     })
+     .catch((err) => {
+         console.log(err)
+     })
+})
 
-// app.get('/all-blogs',(req,res) => {
-//     Blog.find() // returns all documents in collection. Don't have to create an instance of Blog
-//     .then((result) => {
-//         res.send(result)
-//     })
-//     .catch((err) => {
-//         console.log(err)
-//     })
-// })
+app.get('/all-blogs',(req,res) => {
+    Blog.find() // returns all documents in collection. Don't have to create an instance of Blog
+    .then((result) => {
+        res.send(result)
+    })
+    .catch((err) => {
+        console.log(err)
+    })
+})
 
-// app.get('/single-blog',(req,res) => {
-//     Blog.findById("6237afb98341e786e4e36c0f") // returns all documents in collection. Don't have to create an instance of Blog
-//     .then((result) => {
-//         res.send(result)
-//     })
-//     .catch((err) => {
-//         console.log(err)
-//     })
-// })
+app.get('/single-blog',(req,res) => {
+    Blog.findById("6237afb98341e786e4e36c0f") // returns all documents in collection. Don't have to create an instance of Blog
+    .then((result) => {
+        res.send(result)
+    })
+    .catch((err) => {
+        console.log(err)
+    })
+})
 
-//browser hangs here because it doesn't know how to move on after this use method
-//next() helps the program move on
-// app.use((req,res, next) => {
-//     console.log('new request made');
-//     console.log('host: ', req.hostname)
-//     console.log('path: ', req.path)
-//     console.log('method: ', req.method)
-//     next() //go to other functions down below
-// })
+// browser hangs here because it doesn't know how to move on after this use method
+// next() helps the program move on
+app.use((req,res, next) => {
+    console.log('new request made');
+    console.log('host: ', req.hostname)
+    console.log('path: ', req.path)
+    console.log('method: ', req.method)
+    next() //go to other functions down below
+})
 
 
 app.get('/', (req, res) => {
