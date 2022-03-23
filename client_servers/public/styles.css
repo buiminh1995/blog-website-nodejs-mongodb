@@ -52,7 +52,31 @@
     margin-left: 20px;
     }
     /* index styles */
+    .blogs a{
+        display: block;
+        margin: 40px 0;
+        padding-left: 30px;
+        border-left: 6px solid crimson;
+    }
+    .blogs a:hover h3 { 
+        /* if cursor hovers over a then h3 changes color */
+        color: crimson;
+    }
     /* details styles */
+    .details{
+        position: relative; /* to set the position of delete button relative to this class*/
+    }
+    .delete {
+        position: absolute;
+        top: 0;
+        right: 0;
+        border-radius: 50%;
+        padding: 8px;
+    }
+    .delete:hover {
+        cursor: pointer;
+        box-shadow: 1px 2px 3px rgba(0,0,0,0.2);
+    }
     /* create styles */
     .create-blog form{
     max-width: 400px; /*for the blue part inside */

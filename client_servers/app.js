@@ -2,6 +2,7 @@ const express = require('express')
 const morgan = require('morgan')
 const mongoose = require('mongoose')
 const Blog = require('./models/blog')
+const { urlencoded } = require('express')
 //express app
 const app = express()
 
@@ -20,65 +21,58 @@ app.set('view engine', 'ejs')
 
 //middleware and static file
 app.use(express.static('public'))
+app.use(express.urlencoded({ extended: true })) //use this middleware to access post information (app.post line)
 app.use(morgan('dev'))
 
 //mongoose and mongo sandbox routes
-app.get("/app-blog",(req,res) => {
-     const blog = new Blog({
-         title: 'new blog',
-         snippet: 'about my new blog',
-         body: 'more about my new blog'
-     })
-     blog.save()
-     .then((result) => {
-         res.send(result)
-     })
-     .catch((err) => {
-         console.log(err)
-     })
-})
+// app.get("/app-blog",(req,res) => {
+//      const blog = new Blog({
+//          title: 'new blog',
+//          snippet: 'about my new blog',
+//          body: 'more about my new blog'
+//      })
+//      blog.save()
+//      .then((result) => {
+//          res.send(result)
+//      })
+//      .catch((err) => {
+//          console.log(err)
+//      })
+// })
 
-app.get('/all-blogs',(req,res) => {
-    Blog.find() // returns all documents in collection. Don't have to create an instance of Blog
-    .then((result) => {
-        res.send(result)
-    })
-    .catch((err) => {
-        console.log(err)
-    })
-})
+// app.get('/all-blogs',(req,res) => {
+//     Blog.find() // returns all documents in collection. Don't have to create an instance of Blog
+//     .then((result) => {
+//         res.send(result)
+//     })
+//     .catch((err) => {
+//         console.log(err)
+//     })
+// })
 
-app.get('/single-blog',(req,res) => {
-    Blog.findById("6237afb98341e786e4e36c0f") // returns all documents in collection. Don't have to create an instance of Blog
-    .then((result) => {
-        res.send(result)
-    })
-    .catch((err) => {
-        console.log(err)
-    })
-})
+// app.get('/single-blog',(req,res) => {
+//     Blog.findById("6237afb98341e786e4e36c0f") // returns all documents in collection. Don't have to create an instance of Blog
+//     .then((result) => {
+//         res.send(result)
+//     })
+//     .catch((err) => {
+//         console.log(err)
+//     })
+// })
 
 // browser hangs here because it doesn't know how to move on after this use method
 // next() helps the program move on
-app.use((req,res, next) => {
-    console.log('new request made');
-    console.log('host: ', req.hostname)
-    console.log('path: ', req.path)
-    console.log('method: ', req.method)
-    next() //go to other functions down below
-})
+// app.use((req,res, next) => {
+//     console.log('new request made');
+//     console.log('host: ', req.hostname)
+//     console.log('path: ', req.path)
+//     console.log('method: ', req.method)
+//     next() //go to other functions down below
+// })
 
-
+//routes
 app.get('/', (req, res) => {
-    const blogs = [
-        {title: 'Yoshi finds eggs', snippet: 'Lorem ipsum dolor sit amet consectetur'},
-        {title: 'Mario finds stars', snippet: 'Lorem ipsum dolor sit amet consectetur'},
-        {title: 'How to defeat bowser', snippet: 'Lorem ipsum dolor sit amet consectetur'},
-      ];
-    //res.send('<p>home page</p>')
-    // res.sendFile('./views/index.html', {root:__dirname})
-    //ejs
-    res.render('index', {title: 'Home', blogs}) //could be written as blog: blog //the object will be sent to index.ejs
+    res.redirect('/blogs')
 })
 
 // app.use((req,res, next) => {
@@ -89,6 +83,54 @@ app.get('/', (req, res) => {
 app.get('/about', (req, res) => {
     // res.sendFile('./views/about.html', {root:__dirname})
     res.render('about', {title: 'About'})
+})
+
+// blog routes
+app.get('/blogs', (req,res) => {
+    Blog.find().sort({createdAt: -1}) //descending order == newer on top of page
+    .then((result) => {
+        res.render('index', {title: 'All Blogs', blogs: result})
+    })
+    .catch((err) => {
+        console.log(err)
+    })
+})
+
+//Get information from create file
+app.post('/blogs', (req,res) => {
+    const blog = new Blog(req.body)
+    blog.save()
+    .then((result) => {
+        res.redirect('/blogs')
+    })
+    .catch((err) => {
+        console.log(err)
+    })
+})
+
+// Use colon (:) for route parameter
+app.get('/blogs/:id', (req, res) => {
+    const id = req.params.id //id to match the route parameter
+    Blog.findById(id)
+    .then((result) => {
+        res.render('details', {blog: result, title: 'Blog details'})
+    })
+    .catch((err) => {
+        console.log(err)
+    })
+})
+
+app.delete('/blogs/:id', (req, res) => {
+    const id = req.params.id //id is from :id above
+    //When we do AJAX request, we can't redirect
+    //
+    Blog.findByIdAndDelete(id)
+    .then(result => {
+        res.json({redirect: '/blogs'}) //this object is sent back to details.ejs. This is the result of fetch()
+    })
+    .catch(err => {
+        console.log(err)
+    })
 })
 
 app.get('/blogs/create', (req, res) => {
